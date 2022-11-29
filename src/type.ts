@@ -24,7 +24,7 @@ export type LoginAuth = {
 }
 
 export type Tterrain = {
-
+    id:number
 }
 
 export type TGrille = Ref<Tterrain>;
