@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.form {
+    @apply grid grid-cols-[1fr_2fr]
+}
+.form {
+
+}
+
+.btn { @apply rounded-none }
+.label { @apply rounded-none }
+.input-group, .input-group>:last-child, .input-group>:first-child
+    { @apply rounded-none }

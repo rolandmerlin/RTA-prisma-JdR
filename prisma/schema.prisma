@@ -1,0 +1,172 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+	id	Int 	@id @default(autoincrement())
+	pseudo	String 	@unique
+	email 	String  @unique
+	passwd  String
+	token 	String  @default("")
+	acl	ACL[]
+}
+
+model ACL {
+	id 	Int 	@id @default(autoincrement())
+	userId  Int
+	user	User	@relation(fields: [userId], references: [id])
+	table	String  @default("")
+}
+
+model Sorts {
+	id				Int 	@id @default(autoincrement())
+	lng				String 	@default("fr")
+	lvls 			Int		@default(0)
+	TmpInc  		String  @default("1_act")
+	Portee  		Int 	@default(0)
+	Compo 			String  @default("V,S")
+	Requis  		String  @default("")
+	Duree  			String  @default("instant")
+	Description 	String 	@db.VarChar(6000) @default("")
+	Effet			String  @default("deg lvl0:deg:ice:1d6: lvl5:deg:ice:1d6: lvl11:deg:ice:1d6: lvl17:deg:ice:1d6:")
+	sortPlayer 		SortPlayer[]
+}
+
+model Player {
+	id 				Int 	@id 	@default(autoincrement())
+	lvl				Int  	@default(1)
+	alignement 		String  @default("chaotique bon")
+	classe 			String  @default("")
+	ssclasse 		String  @default("")
+	race 			String  @default("")
+	sexe 			String  @default("m")
+	force 			Int     @default(10)
+	dexterite       Int 	@default(10)
+	constitution    Int 	@default(10)
+	intelligence    Int     @default(10)
+	sagesse         Int     @default(10)
+	charisme 		Int     @default(10)
+	vitesse 		Int 	@default(9)
+	vie 			Int 	@default(8)
+	vie_de			Int 	@default(8)
+	vie_max 		Int 	@default(8)
+	vie_temp 		Int 	@default(0)
+	jds_mort_echec  Int 	@default(0)
+	jds_mort_succ   Int 	@default(0)
+	armes 			String  @default("armes courantes")
+	armure 			String 	@default("legere")
+	outils			String  @default("")
+	langue 			Langue[]
+	stors 			SortPlayer[]
+	jet				Jet[]
+	PP 			Int     @default(0)
+	PO 			Int 	@default(10)
+	PA			Int 	@default(0)
+	PC 			Int 	@default(0)
+	Sac_A_Dos   Sac_a_dos[]
+	apparence	String  @db.Text @default("")
+	traits 		String  @db.Text @default("")
+	ideaux 		String  @db.Text @default("")
+	liens 		String  @db.Text @default("")
+	defaut 		String  @db.Text @default("")
+	historique  String  @db.Text @default("")
+	allies		String  @db.Text @default("")
+	PX 			Int 	@default(0)
+	NextPX 		Int 	@default(300)
+	notes 		String  @db.Text @default("")
+	props 		String  @db.Text @default("")
+	tresor		String  @db.Text @default("")
+	details 	String  @db.Text @default("")
+}
+
+model Langue {
+	id		Int 	@id @default(autoincrement())
+	user_id Int		
+	lng     String 	
+	player  Player  @relation(fields: [user_id], references: [id])
+}
+
+model SortPlayer {
+	id 		Int 	@id @default(autoincrement())
+	Player_id	Int
+	Player  Player  @relation(fields: [Player_id], references: [id])
+	sort_id Int
+	Sort    Sorts   @relation(fields: [sort_id], references: [id])
+}
+
+model Jet {
+	id			Int		@id @default(autoincrement())
+	Acrob 		Int 	@default(0)
+	Arcane  	Int 	@default(0)
+	Athel   	Int 	@default(0)
+	Discr		Int 	@default(0)
+	Dress		Int 	@default(0)
+	Escam 		Int 	@default(0)
+	Hist    	Int 	@default(0)
+	Intim   	Int 	@default(0)
+	Invest  	Int 	@default(0)
+	Medecin 	Int 	@default(0)
+	Nature  	Int 	@default(0)
+	Percept 	Int 	@default(0)
+	Persuat 	Int 	@default(0)
+	Relig   	Int 	@default(0)
+	Repres  	Int 	@default(0)
+	Survie  	Int 	@default(0)
+	Tromp   	Int 	@default(0)
+	Player_id	Int		@default(0)
+	Player  	Player  @relation(fields: [Player_id], references: [id])
+}
+
+model Combat {
+	id 			Int 	@id @default(autoincrement())
+	initiative  Int 	@default(0)
+	arme1Id		Int
+	Arme1		Armes	@relation("combat1",fields: [arme1Id], references: [id])
+	arme2Id		Int
+	Arme2 		Armes 	@relation("combat2",fields: [arme2Id], references: [id])
+	arme3Id 	Int
+	Arme3 		Armes 	@relation("combat3",fields: [arme3Id], references: [id])
+	arme4Id 	Int
+	Arme4 		Armes 	@relation("combat4", fields: [arme4Id], references: [id])
+}
+
+model Armes {
+	id 			Int 		@id @default(autoincrement())
+	name		String  	@default("")
+	degat		String  	@default("1d6:contondant")
+	poids		Float		@default(0)
+	prix 		String 		@default("1pc")
+	portee 		Int 		@default(0)
+	props 		String 		@default("")
+	typeArm 	String  	@default("polyvalente")
+	combat1		Combat[]	@relation("combat1")
+	combat2		Combat[]	@relation("combat2")
+	combat3		Combat[]	@relation("combat3")
+	combat4		Combat[]	@relation("combat4")
+	sac			Sac_a_dos[] @relation("sac")
+}
+
+model Sac_a_dos {
+	id 			Int 		@id @default(autoincrement())
+	player_id	Int
+	player		Player 		@relation(fields: [player_id], references: [id])
+	item_id		Int			@default(0)
+	item_nmb	Int
+	armeId 		Int
+	arme		Armes		@relation("sac", fields: [armeId], references: [id])
+}
+
+model Item {
+	id 			Int 		@id @default(autoincrement())
+	name 		String 		@default("")
+	props 		String 		@default("")
+	poids 		Float 		@default(0)
+}
