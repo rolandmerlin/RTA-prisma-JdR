@@ -9,6 +9,7 @@ export type Tmessage = {
     login?:string
     password?:string
     success?:string
+    terrain?:Tterrain[]
     user?:{
         id:number
         pseudo:string
@@ -25,6 +26,31 @@ export type LoginAuth = {
 
 export type Tterrain = {
     id:number
+    name:string
+    hauteur:number 
+    difficulte:number
+    couleur:string
+    image:string
 }
 
-export type TGrille = Ref<Tterrain>;
+export type Topo = {
+    t:number 
+    h:number 
+    p:number
+}
+
+export type Tpiege = {
+
+}
+
+export type Poste = {
+    id:number
+    name:String
+    life:number
+    desc:String
+}
+
+export type TGrille = Ref<{
+    terrain:Tterrain
+    piege?:Tpiege
+}>;

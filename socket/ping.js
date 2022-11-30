@@ -13,8 +13,6 @@ const AuthToken = (msg,io,socket,crud,prisma) => {
 module.exports = (msg,io,socket,crud,prisma) => {
     if (typeof msg.action == 'undefined') return 
     switch(msg.action){
-        case 'auth:login' :return Login(msg,io,socket,crud,prisma)
-        case 'auth:logout':return Logout(msg,io,socket,crud,prisma)
-        case 'auth:token' :return AuthToken(msg,io,socket,crud,prisma)
+        case 'ping' :return ws.SendAction('pong',{})
     }
 }

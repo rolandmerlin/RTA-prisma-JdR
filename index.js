@@ -12,6 +12,7 @@ const prisma = new PrismaClient()
 
 const socket_auth = require('./socket/auth.js')
 const socket_ping = require('./socket/ping.js')
+const socket_terrain = require('./socket/terrain.js')
 const crud = require('./socket/crud.js')
 
 const { WebSocketServer } = require('ws')
@@ -23,14 +24,22 @@ extends_wb.wss_extends(wss)
 wss.on('connection',(ws)=>{
     extends_wb.ws_extends(ws)
     ws.on('message',(msg)=>{
-        let message = JSON.parse(String(msg))
-        console.log('-----------------')
-        console.log(message)
-        if (typeof message.action==='undefined') return
-        if (/ping:/.test(message.action)) return socket_ping(message,wss,ws,crud,prisma)
-        if (/auth:/.test(message.action)) return socket_auth(message,wss,ws,crud,prisma)
+        try{
+            let message = JSON.parse(String(msg))
+            console.log('-----------------')
+            console.log(message)
+            if (typeof message.action==='undefined') return
+            if (/ping:/.test(message.action)) return socket_ping(message,wss,ws,crud,prisma)
+            if (/auth:/.test(message.action)) return socket_auth(message,wss,ws,crud,prisma)
+            if (/terrain:/.test(message.action)) return socket_terrain(message,wss,ws,crud,prisma)
+
+            ws.send('Hello')
+        } catch (e){
+            console.log('Error = ', String(msg))
+        }
+        
     })
-    ws.send('Hello')
+    
 })
 
 app.use(express.static('dist'))

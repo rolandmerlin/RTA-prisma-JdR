@@ -1,9 +1,8 @@
 <template>
-  <debug />
   <navigation />
   <div class="app--content">
     <router-view />
-    <ceditormap class="w-[600px] h-[600px]" :grille="12" />
+    <ceditormap class="w-screen h-[800px]" :grille="12" />
   </div>
 </template>
 <script setup lang="ts">
@@ -14,7 +13,7 @@ import { ref, provide, watch } from "vue";
 import type { Ref } from "vue";
 import { useStore } from "vuex";
 import Socket from "./lib/websocket";
-import { Tmessage } from "./type";
+import { Tmessage, Tterrain } from "./type";
 import { useRouter } from "vue-router";
 //// Connexion
 window.Wsocket = new Socket();
@@ -23,14 +22,13 @@ const store = useStore();
 const router = useRouter();
 
 //// Synchro avec la fenetre de login
-const login: Ref<string> = ref<string>("");
-const passwd: Ref<string> = ref<string>("");
 const error: Ref<string> = ref<string>("");
+provide("error", error);  
 const success: Ref<string> = ref<string>("");
-const time: Ref<number> = ref(0);
-provide("auth", { login, passwd, time });
-provide("error", error);
-provide("success", success);
+provide("success", success);  
+const terrain: Ref<Tterrain[]> = ref<Tterrain[]>([]);
+provide("terrain", { terrain });
+Wsocket.SendAction('terrain:get',{})
 
 if (localStorage.getItem("auth"))
   window.Wsocket.SendAction("auth:reauth", {
@@ -38,9 +36,9 @@ if (localStorage.getItem("auth"))
   });
 
 ///// Action d'authentification
-watch(time, () => {
-  Wsocket.SendAction("auth:login", { login: login.value, password: passwd.value });
-});
+Wsocket.OnMessage("terrain:get",(message: Tmessage) => {
+  if (typeof message.terrain == 'object') terrain.value = message.terrain
+})
 Wsocket.OnMessage("auth:accept", (message: Tmessage) => {
   localStorage.setItem("auth", JSON.stringify(message));
   store.commit("auth", message);

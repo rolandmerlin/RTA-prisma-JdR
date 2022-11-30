@@ -1,30 +1,16 @@
 <template>
-  <div
-    class="fixed bottom-0 right-0 h-auto w-96 border-2 border-b-0 border-r-0 border-gray p-4 cursor-pointer z-10 bg-white"
-  >
+  <div class="fixed bottom-0 right-0 h-auto w-96 border-2 border-b-0 border-r-0 border-gray p-4 cursor-pointer z-10 bg-white">
     <div v-on:click="toogle = !toogle" class="font-bold">Debug</div>
     <div v-if="toogle">
-      <template v-if="typeof Auth === 'object'">
-        <hr />
-        Auth :<br />
-        <div class="grid grid-cols-[1fr_2fr]">
-          <b>Login</b>
-          <span>{{ Auth.login }}</span>
-          <b>Password</b>
-          <span>{{ Auth.passwd }}</span>
-          <b>Time</b>
-          <span>{{ Auth.time }}</span>
-        </div>
-      </template>
       <template v-if="typeof error !== 'undefined'">
-        <hr />
+        <hr>
         <div class="grid grid-cols-[1fr_2fr]">
           <b>Erreur : </b>
           <span>{{ error }}</span>
         </div>
       </template>
       <template v-if="typeof success !== 'undefined'">
-        <hr />
+        <hr>
         <div class="grid grid-cols-[1fr_2fr]">
           <b>Success :</b>
           <span>{{ success }}</span>
@@ -39,8 +25,9 @@ import type { Ref } from "vue";
 import { LoginAuth } from "../type";
 const toogle = ref(false);
 
-const Auth = inject<LoginAuth>("auth");
 const error = inject<Ref<string>>("error");
 const success = inject<Ref<string>>("success");
+
+
 </script>
 <style lang="postcss"></style>

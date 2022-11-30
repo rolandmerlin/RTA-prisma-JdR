@@ -72,19 +72,19 @@ model Player {
 	PA			Int 	@default(0)
 	PC 			Int 	@default(0)
 	Sac_A_Dos   Sac_a_dos[]
-	apparence	String  @db.Text @default("")
-	traits 		String  @db.Text @default("")
-	ideaux 		String  @db.Text @default("")
-	liens 		String  @db.Text @default("")
-	defaut 		String  @db.Text @default("")
-	historique  String  @db.Text @default("")
-	allies		String  @db.Text @default("")
+	apparence	String  @db.Text
+	traits 		String  @db.Text
+	ideaux 		String  @db.Text
+	liens 		String  @db.Text
+	defaut 		String  @db.Text
+	historique  String  @db.Text
+	allies		String  @db.Text
 	PX 			Int 	@default(0)
 	NextPX 		Int 	@default(300)
-	notes 		String  @db.Text @default("")
-	props 		String  @db.Text @default("")
-	tresor		String  @db.Text @default("")
-	details 	String  @db.Text @default("")
+	notes 		String  @db.Text
+	props 		String  @db.Text
+	tresor		String  @db.Text
+	details 	String  @db.Text
 }
 
 model Langue {
@@ -179,7 +179,7 @@ model Item {
 model Terrain {
 	id			Int 		@id @default(autoincrement())
 	name		String 		@default("")
-	hauteur 	Int 		@default(0)
+	hauteur 	Int 		@default(0)	/// Hauteur par défaut
 	difficulte  Int 		@default(0)
 	couleur		String 		@default("#000")
 	image 		String      @default("")
@@ -234,6 +234,4 @@ model Quest {
 	pngId 		Int 		@default(0) /// Numéro Id du PNG
 	typeId		Int 		@default(0) /// Id du Genre de quest
 	props		String 		@default("")
-
-
 }
