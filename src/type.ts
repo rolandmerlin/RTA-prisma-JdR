@@ -34,9 +34,11 @@ export type Tterrain = {
 }
 
 export type Topo = {
-    t:number 
-    h:number 
-    p:number
+    t:number    /// Type de terrain
+    h:number    /// Hauteur de terrain
+    p:number    /// Hauteur de profond
+    i:number    /// Item du conteneur
+    c:number[]  /// Liste d'items
 }
 
 export type Tpiege = {

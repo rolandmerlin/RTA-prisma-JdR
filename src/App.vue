@@ -8,7 +8,7 @@
 <script setup lang="ts">
 import ceditormap from "./components/editor_map.vue";
 import navigation from "./components/navigation.vue";
-import debug from "./components/debug.vue";
+//import debug from "./components/debug.vue";
 import { ref, provide, watch } from "vue";
 import type { Ref } from "vue";
 import { useStore } from "vuex";
