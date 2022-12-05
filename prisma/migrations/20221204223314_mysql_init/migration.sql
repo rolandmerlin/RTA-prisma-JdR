@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE `porte` ADD COLUMN `props` VARCHAR(191) NOT NULL DEFAULT '';
+
+-- AlterTable
+ALTER TABLE `terrain` ADD COLUMN `props` VARCHAR(191) NOT NULL DEFAULT '';

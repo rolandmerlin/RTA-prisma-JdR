@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html, body {
+    @apply overflow-x-hidden overflow-y-hidden
+}
+
 .form {
     @apply grid grid-cols-[1fr_2fr]
 }
@@ -10,6 +14,8 @@
 }
 
 .btn { @apply rounded-none }
-.label { @apply rounded-none }
+.label { @apply rounded-none leading-10 }
+input { @apply text-center h-10 }
+input, input:hover { @apply outline-none border-b-2 border-solid border-gray-300 }
 .input-group, .input-group>:last-child, .input-group>:first-child
     { @apply rounded-none }

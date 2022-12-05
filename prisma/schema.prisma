@@ -183,7 +183,8 @@ model Terrain {
 	difficulte  Int 		@default(0)
 	couleur		String 		@default("#000")
 	image 		String      @default("")
-	plafond 		Int 	@default(0)    ////  Sans plafond
+	plafond 	Int 		@default(0)    ////  Sans plafond
+	props 		String 		@default("")
 }
 
 // DD sauvegarde et bonus d'attaque
@@ -221,6 +222,7 @@ model Porte {
 	id 			Int 		@id @default(autoincrement())
 	name 		String 		@default("")
 	life		Int 		@default(0) 		// Vie = 0 => Indestructible
+	props		String      @default("")
 	desc 		String 		@default("")
 }
 

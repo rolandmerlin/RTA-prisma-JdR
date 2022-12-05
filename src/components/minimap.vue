@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <div class="w-[400px] h-[400px] mx-auto" :style="'width:'+props.grille.length+'px;height:'+props.grille.length+'px'">
+    <div class="w-full">
+        <div class="w-full h-full mx-auto" :style="'width:'+props.grille.length+'px;height:'+props.grille.length+'px'">
             <canvas id="carte" :width="props.grille.length" :height="props.grille.length"></canvas>
             <!--canvas id="brouillard" class="w-full h-full"></canvas-->        
         </div>
@@ -35,6 +35,7 @@
 
     const Mounted = ref<boolean>(false)
     onMounted(()=>{ Mounted.value = true })
+    watch(props.grille,()=> SCM() )
     let hwnd = setInterval(()=>{
         if (DATA===undefined) return
         if (DATA.terrain.value===undefined) return

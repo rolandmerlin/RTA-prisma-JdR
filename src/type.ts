@@ -33,12 +33,17 @@ export type Tterrain = {
     image:string
 }
 
-export type Topo = {
+export type sTopo = {
     t:number    /// Type de terrain
     h:number    /// Hauteur de terrain
-    p:number    /// Hauteur de profond
+    p:number    /// Hauteur de plafond
     i:number    /// Item du conteneur
     c:number[]  /// Liste d'items
+}[][]
+
+export type Topo = {
+    topo:sTopo
+    description:string
 }
 
 export type Tpiege = {
