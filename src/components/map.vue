@@ -42,7 +42,7 @@
 
   let data:Tterrain[] = []
 
-  let lastColor = 'black'
+  let lastColor = 'transparent'
   const Color = (x:number,y:number) => {
     if (data.length==0){
       DATA?.terrain.value.forEach(element => {
