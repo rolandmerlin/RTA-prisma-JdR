@@ -1,5 +1,5 @@
 const GetTerrain = async(msg,wss,ws,crud,prisma) => {
-    ws.SendAction('terrain:get', {'terrain': await prisma.terrain.findMany()})
+    ws.SendAction('terrain:get', {'terrain': await prisma.terrain.findMany({orderBy:{ name:'asc' }})})
 }
 
 module.exports = (msg,wss,ws,crud,prisma) => {

@@ -31,6 +31,8 @@ export type Tterrain = {
     difficulte:number
     couleur:string
     image:string
+    plafond:number
+    props:string
 }
 
 export type sTopo = {

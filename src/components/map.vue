@@ -5,8 +5,9 @@
         <template v-for="x in gx" :key="'gridYmap_' + x">
           <div
             :class="'block w-full h-full border-[1px] border-solid border-transparent text-xs text-right select-none '+((x==posPerso)&&(y==posPerso)&&'border-black blink'|| '')+(props.edit&&' border-gray-500/60'||'')"
-            :style="'background-color:'+Color(x,y)+';width:calc(850px / '+gx+');height:calc(850px / '+gx+');'"
+            :style="'background-color:'+Color(x,y)+';width:calc(850px / '+gx+');height:calc(850px / '+gx+');'+Img(x,y)"
             v-html="Delta(x,y)"
+            :title="Title(x,y)"
             v-on:click="setPos(x,y)"></div>
         </template>
       </template>
@@ -39,12 +40,24 @@
     props.sel.y= y - 19 + props.sel.y
   }
 
-  const Sel = (x:number,y:number) => {
-    props.sel.x = x - 18 + props.sel.x
-    props.sel.y = y - 18 + props.sel.y
-  }
+  let data:Tterrain[] = []
 
+  let lastColor = 'black'
   const Color = (x:number,y:number) => {
+    if (data.length==0){
+      DATA?.terrain.value.forEach(element => {
+        data[element.id]={
+          id:         element.id,
+          name:       element.name,
+          hauteur:    element.hauteur,
+          difficulte: element.difficulte,
+          couleur:    element.couleur,
+          image:      element.image,
+          plafond:    element.plafond,
+          props:      element.props
+        }
+      })
+    }
     let X = props.sel.x + ( x - 19 )
     let Y = props.sel.y + ( y - 19 )
     if (X<0) return 'black'
@@ -54,8 +67,33 @@
     let id = props.grille[X][Y].t
     if (id==0) return 'blank'
     if (typeof DATA ==='undefined') return 'transparent'
-    //if (typeof DATA.terrain.value[id-1] === 'undefined') console.log(DATA.terrain.value[0])
-    return DATA.terrain.value[id-1]?.couleur
+    if (data[id].couleur!=='orange') lastColor = data[id].couleur
+    return data[id]?.couleur=='orange'?lastColor:data[id]?.couleur
+  }
+
+  const Img = (x:number,y:number) => {
+    let X = props.sel.x + ( x - 19 )
+    let Y = props.sel.y + ( y - 19 )
+    if (X<0) return ''
+    if (Y<0) return ''
+    if (X>(props.grille.length-1)) return ''
+    if (Y>(props.grille.length-1)) return ''
+    let id = props.grille[X][Y].t
+    if (id==0) return ''
+    if (typeof DATA ==='undefined') return ''
+    return 'background-image:url('+data[id]?.image+');background-size:20px 20px;background-repeat:no-repeat;background-position:center center;'
+  }
+
+  const Title = (x:number,y:number) => {
+    let X = props.sel.x + ( x - 19 )
+    let Y = props.sel.y + ( y - 19 )
+    if (X<0) return ''
+    if (Y<0) return ''
+    if (X>(props.grille.length-1)) return ''
+    if (Y>(props.grille.length-1)) return ''
+    let id = props.grille[X][Y].t
+    if (id==0) return ''
+    return data[id].name
   }
 
   const Delta = (x:number,y:number) => {
@@ -69,7 +107,6 @@
     h = props.grille[X][Y].h - props.grille[X][Y].h
     if (h==0) return ''
     return '<span class="'+((h>0)?'text-green-800 font-bold':'text-red-800 font-bold')+'">'+Math.abs(h)+'</span>'
-    //return `<span class="text-green-800 font-bold text-xs">${X},${Y}</span>'`
   }
 
   watch(props.sel,()=>{

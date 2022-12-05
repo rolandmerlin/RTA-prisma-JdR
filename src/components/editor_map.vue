@@ -37,12 +37,12 @@
             <div :class="'ml-2 border-2 border-b-0 border-black p-2 cursor-pointer select-none '+((filter==-999)&&'bg-black text-white'||'')" @click="(filter=-999)">Triggers</div>
             <div :class="'ml-2 border-2 border-b-0 border-black p-2 cursor-pointer select-none '+((filter==999)&&'bg-black text-white'||'')" @click="(filter=999)">Obstacle</div>
           </div>
-          <div class="min-w-full overflow-x-hidden overflow-y-auto flex justify-start items-start flex-wrap h-auto">
+          <div class="min-w-full w-full overflow-x-hidden overflow-y-auto flex justify-start items-start flex-wrap h-auto">
             <template v-for="terrain in DATA?.terrain.value" :key="'ter_'+terrain.id">
-              <template v-if="(typeof terrain === 'object' && terrain.hauteur == filter)">
+              <template v-if="((typeof terrain === 'object') && (terrain.hauteur == filter))">
                 <div
                   :class="('w-24 h-24 mx-auto my-2 flex items-center border-4 border-solid select-none border-transparent '+((lastTerrainId==terrain.id)&&'border-red-700'))"
-                  :style="('background-color:'+terrain?.couleur)"
+                  :style="('background-color:'+terrain?.couleur)+';box-shadow:0 0 3px black;'"
                   v-on:click="setTerrain(terrain?.id||0)">
                   <span class="block text-center text-white font-bold opacity-100 bg-gray-700/50 w-full py-2 text-sm">{{terrain.name}}</span>
                 </div>
@@ -87,11 +87,10 @@
             ),
     description:""
   })
+  let carte = Terrain.topo.map(t => t.map(st => ({...st})))
 
   const filter = ref<number>(0)
 
-  let carte = Terrain.topo.map(t => t.map(st => ({...st})))
-  
   const DATA = inject<{ terrain: Ref<Tterrain[]> }>('terrain')
 
   const lastTerrainId = ref<number>(0)
