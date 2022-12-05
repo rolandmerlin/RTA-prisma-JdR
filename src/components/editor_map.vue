@@ -10,15 +10,17 @@
         <div class="text-right"> {{ infoBlock }} </div>
       </div>
       <div :class="'edtmap--panel ' + (selectPanel == 0 && 'active')">
-        <div class="grid grid-cols-4 gap-4 overflow-y-scroll overflow-x-hidden min-w-full">
-          <label class="text-right font-bold">Position X = </label><span class="text-center"><input type="number" v-model="sel.x" class="w-1/2"/></span>
-          <label class="text-right font-bold">Position Y = </label><span class="text-center"><input type="number" v-model="sel.y" class="w-1/2"/></span>
+        <div class="grid grid-cols-2 overflow-x-hidden min-w-full text-center h-[100px] leading-10">
+          <label class="font-bold h-10">Position X</label>
+          <label class="font-bold h-10">Position Y</label>
+          <span class="h-10"><input type="number" v-model="sel.x" class="w-1/2"/></span>
+          <span class="h-10"><input type="number" v-model="sel.y" class="w-1/2"/></span>
         </div>
-        <div class="w-full col-span-2"><!--cminimap :grille="Terrain"/--></div>
+        <div class="w-full col-span-2"><cminimap :grille="Terrain"/></div>
       </div>
       <div :class="'edtmap--panel ' + (selectPanel == 1 && 'active')">
-        <div class="flex flex-wrap justify-center">
-          <div class="grid grid-cols-6 gap-2 w-full h-10 leading-10">
+        <div>
+          <div class="grid grid-cols-5 gap-2 w-full h-10 leading-10">
             <label class="font-bold">Hauteur</label><input v-model="terrainHauteur"/>
             <label class="font-bold">Plafond</label><input v-model="terrainPlafond"/>
             <input v-model="terrainType" type="hidden"/>
@@ -28,11 +30,18 @@
               <button><img :src="edit&&'./pen.svg'||'./eye.svg'" width="25" v-on:click="(edit=!edit)"/></button>            
             </span>
           </div>
-          <div class="min-w-full h-full overflow-x-hidden overflow-y-auto flex justify-start flex-wrap">
+          &nbsp;<br/>&nbsp;<br/>
+          <div class="flex justify-start border-b-2 border-black">
+            <div :class="'ml-5 border-2 border-b-0 border-black p-2 cursor-pointer select-none '+((filter==0)&&'bg-black text-white'||'')" @click="(filter=0)">Base</div>
+            <div :class="'ml-2 border-2 border-b-0 border-black p-2 cursor-pointer select-none '+((filter==-500)&&'bg-black text-white'||'')" @click="(filter=-500)">Néfaste</div>
+            <div :class="'ml-2 border-2 border-b-0 border-black p-2 cursor-pointer select-none '+((filter==-999)&&'bg-black text-white'||'')" @click="(filter=-999)">Triggers</div>
+            <div :class="'ml-2 border-2 border-b-0 border-black p-2 cursor-pointer select-none '+((filter==999)&&'bg-black text-white'||'')" @click="(filter=999)">Obstacle</div>
+          </div>
+          <div class="min-w-full overflow-x-hidden overflow-y-auto flex justify-start items-start flex-wrap h-auto">
             <template v-for="terrain in DATA?.terrain.value" :key="'ter_'+terrain.id">
-              <template v-if="typeof terrain === 'object'">
+              <template v-if="(typeof terrain === 'object' && terrain.hauteur == filter)">
                 <div
-                  :class="('w-24 h-24 mx-auto my-2 flex items-center border-4 border-solid border-transparent select-none '+((lastTerrainId==terrain.id)&&'border-red-700'))"
+                  :class="('w-24 h-24 mx-auto my-2 flex items-center border-4 border-solid select-none border-transparent '+((lastTerrainId==terrain.id)&&'border-red-700'))"
                   :style="('background-color:'+terrain?.couleur)"
                   v-on:click="setTerrain(terrain?.id||0)">
                   <span class="block text-center text-white font-bold opacity-100 bg-gray-700/50 w-full py-2 text-sm">{{terrain.name}}</span>
@@ -78,6 +87,8 @@
             ),
     description:""
   })
+
+  const filter = ref<number>(0)
 
   let carte = Terrain.topo.map(t => t.map(st => ({...st})))
   

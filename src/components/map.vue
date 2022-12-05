@@ -4,7 +4,7 @@
       <template v-for="y in gx" :key="'gridXmap_' + y">
         <template v-for="x in gx" :key="'gridYmap_' + x">
           <div
-            :class="'block w-full h-full border-[1px] border-solid border-transparent text-xs text-right '+((x==posPerso)&&(y==posPerso)&&'border-black blink'|| '')+(props.edit&&' border-gray-500/60'||'')"
+            :class="'block w-full h-full border-[1px] border-solid border-transparent text-xs text-right select-none '+((x==posPerso)&&(y==posPerso)&&'border-black blink'|| '')+(props.edit&&' border-gray-500/60'||'')"
             :style="'background-color:'+Color(x,y)+';width:calc(850px / '+gx+');height:calc(850px / '+gx+');'"
             v-html="Delta(x,y)"
             v-on:click="setPos(x,y)"></div>
