@@ -1,11 +1,11 @@
 <template>
-  <div class="block relative w-full h-full bg-grid">
-    <div class="w-full h-full grid" :style="'grid-template-columns:repeat('+gx+',1fr)'" v-if="(typeof DATA !== 'undefined')">
+  <div class="block relative w-full h-full">
+    <div class="w-full h-full grid bg-grid" :style="'grid-template-columns:repeat('+gx+',1fr)'" v-if="(typeof DATA !== 'undefined')">
       <template v-for="y in gx" :key="'gridXmap_' + y">
         <template v-for="x in gx" :key="'gridYmap_' + x">
           <div
-            :class="'block w-full h-full border-[1px] border-solid border-transparent text-xs text-right select-none '+((x==posPerso)&&(y==posPerso)&&'border-black blink'|| '')+(props.edit&&' border-gray-500/60'||'')"
-            :style="'background-color:'+Color(x,y)+';width:calc(850px / '+gx+');height:calc(850px / '+gx+');'+Img(x,y)"
+            :class="'block w-[20px] h-[20px] border-[1px] border-solid border-transparent text-xs text-right select-none box-border '+((x==posPerso)&&(y==posPerso)&&'border-black blink'|| '')+(props.edit&&' border-gray-500/60'||'')"
+            :style="'background-color:'+Color(x,y)+';width:calc(740px / '+gx+');height:calc(740px / '+gx+');'+Img(x,y)"
             v-html="Delta(x,y)"
             :title="Title(x,y)"
             v-on:click="setPos(x,y)"></div>
@@ -15,9 +15,9 @@
   </div>
 </template>
 <script setup lang="ts">
-  import { ref ,inject, watch } from "vue";
-  import type { Ref } from 'vue';
-  import { sTopo, Tterrain } from "../type";
+  import { ref ,inject, watch } from "vue"
+  import type { Ref } from 'vue'
+  import { sTopo, Tterrain } from "../type"
 
   const props = defineProps<{
     sel:{
@@ -26,14 +26,14 @@
     },
     grille:sTopo,
     edit:boolean
-  }>();
+  }>()
 
-  const gx = 37;
+  const gx = 37
   const posPerso = Math.floor(gx/2)+1
 
-  type TRefTerrain = { terrain: Ref<Tterrain[]> }
+  //type TRefTerrain = { terrain: Ref<Tterrain[]> }
 
-  const DATA = inject<{ terrain: Ref<Tterrain[]> }>('terrain');
+  const DATA = inject<{ terrain: Ref<Tterrain[]> }>('terrain')
 
   const setPos = (x:number, y:number) => {
     props.sel.x= x - 19 + props.sel.x
@@ -68,6 +68,10 @@
     if (id==0) return 'blank'
     if (typeof DATA ==='undefined') return 'transparent'
     if (data[id].couleur!=='orange') lastColor = data[id].couleur
+    if (X<2) lastColor = data[props.grille[X+1][Y].t||0]?.couleur || 'transparent'
+    if (X>gx-3) lastColor = data[props.grille[X-1][Y].t||0]?.couleur || 'transparent'
+    if (Y<2) lastColor = data[props.grille[X][Y+1].t||0]?.couleur || 'transparent'
+    if (Y>gx-3) lastColor = data[props.grille[X][Y-1].t||0]?.couleur || 'transparent'
     return data[id]?.couleur=='orange'?lastColor:data[id]?.couleur
   }
 
@@ -119,8 +123,8 @@
 </script>
 <style lang="postcss">
   @keyframes blink {
-    0%  { @apply border-gray-300/25   }
-    49% { @apply border-gray-300/25   }
+    0%  { @apply border-gray-700/100  }
+    49% { @apply border-gray-700/100  }
     50% { @apply border-gray-300/75   }
     99% { @apply border-gray-300/75   }
   }

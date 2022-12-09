@@ -1,7 +1,7 @@
 <template>
   <navigation />
   <div class="app--content">
-    <router-view />
+    <router-view class="z-10" />
     <ceditormap class="w-screen h-[800px]" :grille="12" />
   </div>
 </template>
@@ -77,6 +77,6 @@
 </script>
 <style>
 .app--content {
-  @apply absolute top-[42px] bottom-0 left-0 right-0 py-2;
+  @apply absolute top-[64px] bottom-0 left-0 right-0 p-2;
 }
 </style>
