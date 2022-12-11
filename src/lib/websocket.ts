@@ -52,7 +52,7 @@ class Socket {
         this.sck.onerror = (event:Event) => { this.fn_error(event) }
     }
     OnMessage(definition:string,fn:(message:Tmessage)=>void){ this.fn_message.push( { key:definition, fn } ) }
-    WaitForConnection(fn:()=>{},interval:number=100){
+    WaitForConnection(fn:()=>void,interval:number=100){
         if (this.sck.readyState === 1){
             fn()
         } else {

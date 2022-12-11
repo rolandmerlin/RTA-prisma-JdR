@@ -180,6 +180,7 @@ model Terrain {
 	id			Int 		@id @default(autoincrement())
 	name		String 		@default("")
 	hauteur 	Int 		@default(0)	/// Hauteur par défaut
+	typeTerrain Int 		@default(0) /// Type de terrain
 	difficulte  Int 		@default(0)
 	couleur		String 		@default("#000")
 	image 		String      @default("")

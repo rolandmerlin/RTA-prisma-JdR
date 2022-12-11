@@ -27,6 +27,7 @@ export type LoginAuth = {
 export type Tterrain = {
     id:number
     name:string
+    typeTerrain:number
     hauteur:number 
     difficulte:number
     couleur:string

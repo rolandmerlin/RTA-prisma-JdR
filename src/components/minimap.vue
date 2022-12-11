@@ -7,19 +7,17 @@
     </div>
 </template>
 <script setup lang="ts">
-    import { inject, ref, computed, onMounted, watch } from 'vue'
+    import { ref, onMounted, watch } from 'vue'
     import type { Ref } from 'vue'
     import { Tterrain } from "../type"
+    import { typeTerrainById,typeTerrain } from '../store/typeTerrain'
 
     const props = defineProps(['grille'])
 
     type TRefTerrain = { terrain: Ref<Tterrain[]> }
 
-    const DATA = inject<{ terrain: Ref<Tterrain[]> }>('terrain')
-
     const SCM = () => {
         const canvas = document.getElementById('carte') as HTMLCanvasElement;
-        if (DATA===undefined) return
         if (typeof canvas == 'undefined') return 
         const ctx = canvas.getContext('2d')
         if (ctx === null) return 
@@ -27,7 +25,7 @@
         let length = props.grille.length
         for(let x=0;x<length;x++){
             for(let y=0;y<length;y++){
-                ctx.fillStyle = DATA?.terrain.value[props.grille[x][y].t-1]?.couleur || 'black'
+                ctx.fillStyle = typeTerrainById(props.grille[x][y].t-1)?.couleur || 'black'
                 ctx.fillRect(x,y,1,1)
             }
         }        
@@ -37,8 +35,7 @@
     onMounted(()=>{ Mounted.value = true })
     watch(props.grille,()=> SCM() )
     let hwnd = setInterval(()=>{
-        if (DATA===undefined) return
-        if (DATA.terrain.value===undefined) return
+        if (typeTerrain.reqPending) return
         clearInterval(hwnd)
         SCM()
     },1000)

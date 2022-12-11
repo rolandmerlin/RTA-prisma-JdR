@@ -1,6 +1,6 @@
 <template>
   <div class="grid grid-cols-[740px_1fr] w-screen gap-x-4">
-    <cmap class="w-[740px] max-h-[740px] h-screen" v-model:grille="Terrain.topo" v-model:sel="sel" :edit="edit"/>
+    <cmap class="w-[740px] max-h-[740px] h-screen" v-model:sel="sel" :edit="edit"/>
       <div class="w-full">
         <div class="tabs mx-auto w-[330px]">
         <a :class="'tab tab-lifted '+((selectPanel == 0)&&'tab-active')" v-on:click="selectPanel = 0">Cartes</a> 
@@ -13,38 +13,37 @@
           <span><label class="font-bold h-10">Position X</label><input type="number" v-model="sel.x" class="w-1/2"/></span>
           <span><label class="font-bold h-10">Position Y</label><input type="number" v-model="sel.y" class="w-1/2"/></span>
         </div>
-        <div class="w-full col-span-2"><cminimap :grille="Terrain"/></div>
+        <div class="w-full col-span-2"></div>
       </div>
       <div :class="'edtmap--panel ' + (selectPanel == 1 && 'active')">
         <div class="w-full">
         &nbsp;<br/>
-          <div class="grid grid-cols-3 gap-2 h-10 leading-10 w-full">
+          <div class="grid grid-cols-2 gap-2 h-10 leading-10 w-full">
             <span><label class="font-bold">Hauteur</label> &nbsp; <input v-model="terrainHauteur" class="w-12"/></span>
             <span><label class="font-bold">Plafond</label> &nbsp; <input v-model="terrainPlafond" class="w-12"/></span>
             <input v-model="terrainType" type="hidden"/>
-            <span>
-              <button class="btn btn-primary h-10" v-on:click="(styleLockTerrain=!styleLockTerrain)"><img :src="styleLockTerrain&&'./lock.svg'||'./lock-open.svg'" width="25"/></button>
-              &nbsp;
-              <button class="btn btn-primary h-10" v-on:click="(edit=!edit)"><img :src="edit&&'./pen.svg'||'./eye.svg'" width="25"/></button>            
-            </span>
+
           </div>
+          <div class="leading-10 p-2 flex justify-center">
+            <button class="btn btn-primary h-5 mx-1" v-on:click="(styleLockTerrain=!styleLockTerrain)"><img :src="styleLockTerrain&&'./lock.svg'||'./lock-open.svg'" width="20"/></button>
+            <button class="btn btn-primary h-5 mx-1" v-on:click="(edit=!edit)"><img :src="edit&&'./pen.svg'||'./eye.svg'" width="20"/></button>
+            <button :class="'btn btn-primary h-5 mx-1 '+(rect?'btn-secondary':'')" v-on:click="switch_rect"><div class="h-5 w-5 border-2 border-solid border-black"></div></button>
+          </div>          
           &nbsp;<br/>
           <div class="tabs w-[345px] mx-auto">
-            <a :class="'tab tab-lifted '+((filter == 0   )&&'tab-active')" v-on:click="filter = 0   ">Base</a> 
-            <a :class="'tab tab-lifted '+((filter == -500)&&'tab-active')" v-on:click="filter =-500">Néfaste</a> 
-            <a :class="'tab tab-lifted '+((filter == -999)&&'tab-active')" v-on:click="filter =-999">Triggers</a>
-            <a :class="'tab tab-lifted '+((filter ==  999)&&'tab-active')" v-on:click="filter = 999">Obstable</a>
+            <a :class="'tab tab-lifted '+((filter == TypeTerrain.BASE    )&&'tab-active')" v-on:click="filter = TypeTerrain.BASE    ">Base</a> 
+            <a :class="'tab tab-lifted '+((filter == TypeTerrain.NEFASTE )&&'tab-active')" v-on:click="filter = TypeTerrain.NEFASTE ">Néfaste</a> 
+            <a :class="'tab tab-lifted '+((filter == TypeTerrain.TRIGGER )&&'tab-active')" v-on:click="filter = TypeTerrain.TRIGGER ">Triggers</a>
+            <a :class="'tab tab-lifted '+((filter == TypeTerrain.OBSTACLE)&&'tab-active')" v-on:click="filter = TypeTerrain.OBSTACLE">Obstable</a>
           </div>
           <div class="min-w-full w-full overflow-x-hidden overflow-y-hidden flex justify-start items-start flex-wrap h-auto">
-            <template v-for="terrain in DATA?.terrain.value" :key="'ter_'+terrain.id">
-              <template v-if="((typeof terrain === 'object') && (terrain.hauteur == filter))">
+            <template v-for="terrain in typeTerrain.byType(filter)" :key="'ter_'+terrain.id">
                 <div
                   :class="('w-24 h-24 m-2 flex items-center border-4 border-solid select-none border-transparent '+((lastTerrainId==terrain.id)&&'border-red-700'))"
                   :style="('background-color:'+terrain?.couleur)+';box-shadow:0 0 3px black;'"
                   v-on:click="setTerrain(terrain?.id||0)">
                   <span class="block text-center text-white font-bold opacity-100 bg-gray-700/50 w-full py-2 text-sm">{{terrain.name}}</span>
                 </div>
-              </template>
             </template>
           </div>
           &nbsp;<br/>
@@ -57,11 +56,12 @@
   </div>
 </template>
 <script setup lang="ts">
-  import { ref, inject, watch, reactive } from "vue";
-  import type { Ref } from "vue";
-  import { Topo, Tterrain } from "../type";
+  import { ref, watch, reactive } from "vue";
   import cmap from "./map.vue";
-  import cminimap from './minimap.vue'
+  import { typeTerrain,TypeTerrain } from "../store/typeTerrain"
+  import { useMapStore } from "../store/map"
+  const mapStore = useMapStore()
+  mapStore.create(500,500)
 
   const terrainType = ref<number>(0)
   const terrainHauteur = ref<number>(0)
@@ -72,38 +72,50 @@
 
   const edit = ref<boolean>(true)
 
-  const selectPanel = ref<number>(0);
-  const infoBlock = ref<string>("");
-
-  let carte = Array(25).fill(Array(25).fill({t:0,h:0,p:0,i:0,c:[]}))
-  carte = carte.map(cx => cx.map((st:object) => ({...st})))
-  const Terrain = reactive<Topo>({ topo:carte, description:"" })
+  const selectPanel = ref<number>(0)
+  const infoBlock = ref<string>("")
 
   const filter = ref<number>(0)
 
-  const DATA = inject<{ terrain: Ref<Tterrain[]> }>('terrain')
-
   const lastTerrainId = ref<number>(0)
   const styleLockTerrain = ref<boolean>()
-  const setTerrain = (TerrainId:number) => {
-    if (!edit.value) return 
-    if (sel.x>=carte.length) return
-    if (sel.y>=carte.length) return
-    lastTerrainId.value = TerrainId
-    carte[sel.x][sel.y].t = TerrainId
-    Terrain.topo = [...carte]
+
+  const rect = ref<boolean>(false)
+  const rect_pos = ref<{x:number,y:number, t:number}>({x:0,y:0,t:0})
+  const switch_rect = () => {
+    rect.value = !rect.value
+    rect_pos.value = {
+      x: sel.x,
+      y: sel.y,
+      t: mapStore.maps(sel.x,sel.y).t
+    }
+  }
+
+  const setTerrain= (terrainId:number) => {
+    mapStore.setTerrain(sel.x,sel.y,terrainId)
+    lastTerrainId.value = terrainId
   }
 
   watch(sel,()=>{
     if (sel.x<0) sel.x = 0
-    if (sel.x>(carte.length-1)) sel.x = (carte.length-1)
+    if (sel.x>=mapStore.w) sel.x = mapStore.w - 1
     if (sel.y<0) sel.y = 0
-    if (sel.y>(carte.length-1)) sel.y = (carte.length-1) 
+    if (sel.y>=mapStore.h) sel.y = mapStore.h - 1
     if (!edit.value) return 
     if (styleLockTerrain.value){
-      setTerrain(lastTerrainId.value)
+      mapStore.setTerrain(sel.x, sel.y, lastTerrainId.value)
     } else {
-      if (typeof carte[sel.x][sel.y].t == 'number') lastTerrainId.value = carte[sel.x][sel.y].t
+      lastTerrainId.value = mapStore.maps(sel.x,sel.y).t
+    }
+    if (rect.value){
+      let rangeX = [sel.x,rect_pos.value.x].sort((a,b)=> a<b?-1:1 )
+      let rangeY = [sel.y,rect_pos.value.y].sort((a,b)=> a<b?-1:1 )
+
+      console.log(rect_pos.value)
+      for (let x = rangeX[0]; x<=rangeX[1]; x++)
+        for(let y = rangeY[0]; y<=rangeY[1]; y++)
+          mapStore.setTerrain(x,y,rect_pos.value.t)
+      rect.value = false
     }
   })
 </script>

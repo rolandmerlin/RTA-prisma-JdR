@@ -14,19 +14,16 @@
                 <li><a>Item 3</a></li>
             </ul>
             </li>
-            <li v-if="!auth"><router-link to="/login" class="link no-underline">Login</router-link></li>
-            <li v-if="!auth"><router-link to="/register" class="link no-underline">Register</router-link></li>
-            <li v-if="auth"><router-link to="/logout" class="link no-underline">Logout</router-link></li>      
+            <li v-if="!user.auth"><router-link to="/login" class="link no-underline">Login</router-link></li>
+            <li v-if="!user.auth"><router-link to="/register" class="link no-underline">Register</router-link></li>
+            <li v-if="user.auth"><router-link to="/logout" class="link no-underline">Logout</router-link></li>      
         </ul>
     </div>
 </div>
 </template>
 <script setup lang="ts">
-    import type { ComputedRef } from "vue";
-    import { computed } from "vue";
-    import { useStore } from "vuex";
-    const store = useStore();
-    const auth: ComputedRef<boolean> = computed( () => typeof store.getters.auth !== "boolean" );
+    import { useUserStore } from "../store/user";
+    const user = useUserStore();
 </script>
 <style lang="postcss">
     .link {
