@@ -63,4 +63,15 @@ export type Poste = {
 export type TGrille = Ref<{
     terrain:Tterrain
     piege?:Tpiege
-}>;
+}>
+
+export type TResponeApi<T> = {
+    action:string
+    result:boolean
+    params:T
+}
+
+export type TPosition = {
+    x:number
+    y:number
+}

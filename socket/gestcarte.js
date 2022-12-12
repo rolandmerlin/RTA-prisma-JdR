@@ -2,7 +2,7 @@ const GetTerrain = async(msg,wss,ws,crud,prisma) => {
     ws.SendAction('carte:get', {'terrain': await prisma.terrain.findMany({orderBy:{ name:'asc' }})})
 }
 const PostTerrain = async(msg,wss,ws,crud,prisma) => {
-
+    
 }
 const PutTerrain = async(msg,wss,ws,crud,prisma) => {
 

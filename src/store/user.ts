@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 
 import axios,{ setToken } from '../lib/axios'
-import { TResponeApi } from '../types/type'
+import { TResponeApi } from '../type'
 
 /**                 TYPE               */
 
