@@ -61,9 +61,7 @@ class Socket {
         }
     }
     SendJson(data:object){
-        this.WaitForConnection(()=>{
-            this.sck.send(JSON.stringify(data))
-        },100)
+        this.WaitForConnection(()=>{ this.sck.send(JSON.stringify(data)) },100)
     }
     OnReconnect(fn:()=>void){ this.fn_reconnect = fn }
     OnDisconnect(fn:()=>void){ this.fn_disconnect = fn }

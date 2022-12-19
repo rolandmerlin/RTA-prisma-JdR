@@ -45,6 +45,6 @@ export const typeTerrainByType = (typeid:number) => typeTerrain.byType(typeid)
 export const typeTerrainSet = (terrains:TTypeTerrain[]) => {
     typeTerrain.terrains = terrains
     typeTerrain.reqPending = false
-    console.log(typeTerrain.byId(1))
-    console.log(typeTerrain.byType(0))
+   // console.log(typeTerrain.byId(1))
+   // console.log(typeTerrain.byType(0))
 }

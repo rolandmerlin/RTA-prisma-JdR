@@ -1,9 +1,9 @@
 <template>
   <div class="block relative w-full h-full">
-    <div class="w-full h-full grid bg-grid" :style="'grid-template-columns:repeat('+vx+',1fr)'" v-if="!typeTerrain.reqPending">
-      <template v-for="y in vx" :key="'gridXmap_' + y">
-        <template v-for="x in vx" :key="'gridYmap_' + x + '_' + y">
-          <casemap :case="Case(x,y)" :blink=" x == vm && y == vm" :nmbcx="vx" :edit="edit" v-on:click="setPos(x,y)"/>
+    <div class="w-full h-full grid bg-grid" :style="'grid-template-columns:repeat('+vx+',1fr)'" v-if=" !typeTerrain.reqPending ">
+      <template v-for="y in mapgest.viewRange" :key="'gridXmap_' + y">
+        <template v-for="x in mapgest.viewRange" :key="'gridYmap_' + (x-1) + '_' + (y-1)">
+          <casemap :data-pos="`${x-1} / ${y-1}`" :case="Case(x-1,y-1)" :blink=" x-1 == props.sel.x && y-1 == props.sel.y" :nmbcx="vx" :edit="edit" v-on:click="setPos(x-1,y-1)"/>
         </template>
       </template>
     </div>
@@ -15,7 +15,13 @@
   import casemap from './casemap.vue'
   import { useMapStore } from "../store/map"
 
+  import CMapGest from '../libdesign/mapGest'
+
   const mapStore = useMapStore()
+  mapStore.create(37,37)
+
+  const mapgest = new CMapGest(37)
+  let map = mapgest.map().value
 
   const props = defineProps<{
     sel:{
@@ -29,54 +35,46 @@
   props.sel.x = Math.floor(mapStore.w/2)
   props.sel.y = Math.floor(mapStore.h/2)
 
-  const setPos = (x:number, y:number) => {
-    props.sel.x =  props.sel.x + x - vm
-    props.sel.y = props.sel.y + y - vm
-  }
-
-  const CalPos = ( x:number, y:number ) => {
-    let X = props.sel.x + x - vm
-    let Y = props.sel.y + y - vm
-    return {
-      X,
-      Y,
-      B: (X<0) || (X>=mapStore.w) || (Y<0) || (Y>=mapStore.h)
-    }
+  const setPos = (x:number,y:number) => {
+    props.sel.x = x
+    props.sel.y = y
   }
 
   const Case = (x:number,y:number) => {
-    const { X, Y, B } = CalPos(x,y)
-    let id
-    let h
-    let lastColor
-    if (B){
-      id=0
-      h=0
-      lastColor = 'black'
-    } else {
-      id = mapStore.maps(X,Y).t
-      h = mapStore.maps(X,Y).h - mapStore.maps(X,Y).h
-      lastColor = 'transparent'
-      if (X<mapStore.mw && Y>0 && Y<mapStore.h-1) lastColor = typeTerrainById(mapStore.maps(X+1,Y).t||0)?.couleur || 'black'
-      if (X>mapStore.mw && Y>0 && Y<mapStore.h-1) lastColor = typeTerrainById(mapStore.maps(X-1,Y).t||0)?.couleur || 'black'
-      if (Y<mapStore.mh && X>0 && X<mapStore.w-1) lastColor = typeTerrainById(mapStore.maps(X,Y+1).t||0)?.couleur || 'black'
-      if (Y>mapStore.mh && X>0 && X<mapStore.w-1) lastColor = typeTerrainById(mapStore.maps(X,Y-1).t||0)?.couleur || 'black'
+    let c
+    try { 
+      c = map[x][y]
+    } catch (e){
+      console.log('Case MAP = ',`X = ${x}, Y = ${y} , MAPS = `,map)
+      c = { t:1, h:0, i:0, c:[] }
     }
+    let h = c?.h || 0
+    let lastColor = 'transparent'
+    let lid = 0
+    try {
+      if (y>0 && y<=mapStore.w){
+        if (x<=vm) lid = map[x+1][y].t
+        if (x>=vm) lid = map[x-1][y].t        
+      }
+      if (x>0 && y<=mapStore.h){
+        if (y<=vm) lid = map[x][y+1].t
+        if (x>=vm) lid = map[x][y-1].t        
+      }
+    } catch (e){ }
 
+    lastColor = typeTerrainById(lid)?.couleur || lastColor
     return {
-      style   : 'background-image:url('+(typeTerrainById(id)?.image||'')+');background-size:20px 20px;background-repeat:no-repeat;background-position:center center;',
-      title   : typeTerrainById(id)?.name || "",
-      hauteur : '<span class="'+((h>0)?'text-green-800 font-bold':'text-red-800 font-bold')+'">'+(h?Math.abs(h):'')+'</span>',
+      style   : 'background-image:url('+(typeTerrainById(c.t)?.image||'')+');background-size:20px 20px;background-repeat:no-repeat;background-position:center center;',
+      title   : typeTerrainById(c.t)?.name || "",
+      hauteur : '<span class="'+((c.h>0)?'text-green-800 font-bold':'text-red-800 font-bold')+'">'+(h?Math.abs(c.h):'')+'</span>',
       color   : 
         (
-          B?
-          'black'
-          :typeTerrainById(id)?.couleur=='orange'?lastColor:(typeTerrainById(id)?.couleur||'black')
+          typeTerrainById(c.t)?.couleur!='orange'?(typeTerrainById(c.t)?.couleur||'black'):lastColor
         )
     }
   }
 
-  watch(mapStore._maps,()=>{
+  watch(props.sel,()=>{
     if (props.sel.x<0) props.sel.x = 0
     if (props.sel.x>=mapStore.w) props.sel.x = mapStore.w - 1 
     if (props.sel.y<0) props.sel.y = 0
@@ -85,7 +83,6 @@
 
 </script>
 <style lang="postcss">
-
   .bg-grid {
     background:linear-gradient(45deg,0% white, 50% black, 100% white);
     background-size: 25px 25px;

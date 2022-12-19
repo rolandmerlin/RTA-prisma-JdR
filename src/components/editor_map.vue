@@ -59,16 +59,16 @@
   import { ref, watch, reactive } from "vue";
   import cmap from "./map.vue";
   import { typeTerrain,TypeTerrain } from "../store/typeTerrain"
-  import { useMapStore } from "../store/map"
-  const mapStore = useMapStore()
-  mapStore.create(500,500)
+  import { useGestMap } from "../store/gestmap"
+  const mapStore = useGestMap()
+  mapStore.create(100,100)
 
   const terrainType = ref<number>(0)
   const terrainHauteur = ref<number>(0)
   const terrainPlafond = ref<number>(0)
   const terrainContenant = ref<number[]>([])
 
-  const sel = reactive<{x:number,y:number}>({x:16,y:16})
+  const sel = reactive<{x:number,y:number}>( { x:0, y:0 } )
 
   const edit = ref<boolean>(true)
 
@@ -84,10 +84,15 @@
   const rect_pos = ref<{x:number,y:number, t:number}>({x:0,y:0,t:0})
   const switch_rect = () => {
     rect.value = !rect.value
+    try {
+
+    } catch (e){
+
+    }
     rect_pos.value = {
       x: sel.x,
       y: sel.y,
-      t: mapStore.maps(sel.x,sel.y).t
+      t: lastTerrainId.value
     }
   }
 
@@ -105,7 +110,11 @@
     if (styleLockTerrain.value){
       mapStore.setTerrain(sel.x, sel.y, lastTerrainId.value)
     } else {
-      lastTerrainId.value = mapStore.maps(sel.x,sel.y).t
+      try {
+        lastTerrainId.value = mapStore._map[sel.x][sel.y].t
+      } catch (e){
+        console.log(' SELECTION = ',sel)
+      }
     }
     if (rect.value){
       let rangeX = [sel.x,rect_pos.value.x].sort((a,b)=> a<b?-1:1 )
